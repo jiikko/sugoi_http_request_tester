@@ -79,8 +79,8 @@ module SugoiHttpRequestTester
     private
 
     def export
-      File.write('accessed_list', @accessed_list.join("\n"))
-      File.write('manual_list', @manual_list.join("\n"))
+      File.write('output/accessed_list', @accessed_list.join("\n"))
+      File.write('output/manual_list', @manual_list.join("\n"))
     end
 
     def load_request_list
