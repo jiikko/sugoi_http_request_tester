@@ -25,7 +25,8 @@ tester = SugoiHttpRequestTester.new(
   logs_path: 'logs/*',
 ) do |line|
   /({.*})/ =~ line
-  JSON.parse($1)
+  json = JSON.parse($1)
+  { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
 end
 tester.run
 ```
