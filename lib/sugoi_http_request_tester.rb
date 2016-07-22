@@ -3,6 +3,12 @@ require 'json'
 require 'net/http'
 require 'digest/md5'
 
+# load_request_list をexportする. ログから抽出して次回起動から高速にするため
+#
+# parallel
+# format outputfile
+# UAをリクエストンに含める
+
 module SugoiHttpRequestTester
   class RequestList
     def initialize
@@ -71,7 +77,6 @@ module SugoiHttpRequestTester
     end
 
     private
-
 
     def export
       File.write('accessed_list', @accessed_list.join("\n"))
