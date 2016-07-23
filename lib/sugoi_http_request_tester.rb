@@ -28,8 +28,12 @@ module SugoiHttpRequestTester
     end
 
     def export
-      text = requests.map { |request| request.to_hash }.join("\n")
-      File.write(EXPORT_MANUAL_LIST_PATH, text)
+      text = requests.map { |request| request.to_json }.join("\n")
+      File.write(EXPORT_REQUEST_LIST_PATH, text)
+    end
+
+    def clear
+      @requests = {}
     end
   end
 
@@ -46,14 +50,14 @@ module SugoiHttpRequestTester
       Digest::MD5.hexdigest([@method, @user_agent, @path].join)
     end
 
-    def to_hash
+    def to_json
       { method: @method,
         user_agent: @user_agent,
         path: @path,
         mt: @method,
         ua: @user_agent,
         pt: @path,
-      }
+      }.to_json
     end
   end
 
@@ -66,11 +70,7 @@ module SugoiHttpRequestTester
       @basic_auth = basic_auth
       @logs_path = logs_path
       @request_list = RequestList.new
-      @line_parser_block = ->(line) {
-        /({.*})/ =~ line
-        json = JSON.parse($1)
-        { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
-      }
+      @line_parser_block = json_parse_block
     end
 
     def load_and_run
@@ -104,6 +104,17 @@ module SugoiHttpRequestTester
       end
     end
 
+    def load_exported_request_list
+      File.open(EXPORT_REQUEST_LIST_PATH).each_line do |line|
+        @request_list << Request.new(json_parse_block.call(line))
+        break if countup_and_limit?
+      end
+    end
+
+    def clear_request_list
+      @request_list.clear
+    end
+
     def export_request_list
       @request_list.export
     end
@@ -123,9 +134,9 @@ module SugoiHttpRequestTester
       case to
       when :accessed_list
         puts code
-        @accessed_list << [request.to_hash, code].join(',')
+        @accessed_list << [request.to_json, code].join(',')
       when :manual_list
-        @manual_list << request.to_hash
+        @manual_list << request.to_json
       else
         raise 'bug!!'
       end
@@ -139,6 +150,14 @@ module SugoiHttpRequestTester
         @limit_counter += 1
         @limit_counter > @limit
       end
+    end
+
+    def json_parse_block
+      ->(line){
+        /({.*})/ =~ line
+        json = JSON.parse($1)
+        { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
+      }
     end
   end
 
