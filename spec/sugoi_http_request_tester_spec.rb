@@ -31,6 +31,7 @@ describe SugoiHttpRequestTester do
   end
 
   describe '#export_request_list' do
+    it 'exportすること' do
       log = <<-LOG
 {"mt":"GET","pt":"/index.html","ua":"ddd"}
 {"mt":"GET","pt":"/index2.html","ua":"ddd"}
@@ -50,5 +51,7 @@ describe SugoiHttpRequestTester do
       end
       tester.load_logs
       tester.export_request_list
+      expect(File.open(SugoiHttpRequestTester::EXPORT_REQUEST_LIST_PATH).readlines.size).to eq 3
+    end
   end
 end
