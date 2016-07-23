@@ -28,6 +28,7 @@ tester = SugoiHttpRequestTester.new(
   json = JSON.parse($1)
   { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
 end
+tester.load_logs
 tester.run
 ```
 

@@ -6,10 +6,13 @@ require 'digest/md5'
 # load_request_list をexportする. ログから抽出して次回起動から高速にするため
 #
 # parallel
-# format outputfile
 # UAをリクエストンに含める
 
 module SugoiHttpRequestTester
+  EXPORT_REQUEST_LIST_PATH =  'output/request_list'
+  EXPORT_ACCESSED_LIST_PATH = 'output/accessed_list'
+  EXPORT_MANUAL_LIST_PATH =   'output/manual_list'
+
   class RequestList
     def initialize
       @requests = {}
@@ -21,6 +24,11 @@ module SugoiHttpRequestTester
 
     def requests
       @requests.values
+    end
+
+    def export
+      text = requests.map { |request| request.to_hash }.join("\n")
+      File.write(EXPORT_MANUAL_LIST_PATH, text)
     end
   end
 
@@ -35,6 +43,16 @@ module SugoiHttpRequestTester
 
     def hash
       Digest::MD5.hexdigest([@method, @user_agent, @path].join)
+    end
+
+    def to_hash
+      { method: @method,
+        user_agent: @user_agent,
+        path: @path,
+        mt: @method,
+        ua: @user_agent,
+        pt: @path,
+      }
     end
   end
 
@@ -59,31 +77,28 @@ module SugoiHttpRequestTester
         end
     end
 
+    def load_and_run
+      load_logs
+      run
+    end
+
     def run
-      load_request_list
       @request_list.requests.each do |request|
         if /GET/ =~ request.method
           Net::HTTP.start(@host) do |http|
             req = Net::HTTP::Get.new(request.path)
             req.basic_auth *@basic_auth unless @basic_auth.nil?
             response = http.request(req)
-            add_result(to: :accessed_list, hash: request, code: response.code)
+            add_result(to: :accessed_list, request: request, code: response.code)
           end
         else
-          add_result(to: :manual_list, hash: request)
+          add_result(to: :manual_list, request: request)
         end
       end
       export
     end
 
-    private
-
-    def export
-      File.write('output/accessed_list', @accessed_list.join("\n"))
-      File.write('output/manual_list', @manual_list.join("\n"))
-    end
-
-    def load_request_list
+    def load_logs
       Dir.glob(@logs_path).each do |file_name|
         next if /\.gz$/ =~ file_name
         File.open(file_name).each_line do |line|
@@ -93,13 +108,24 @@ module SugoiHttpRequestTester
       end
     end
 
-    def add_result(to: , hash: , code: nil)
+    def export_request_list
+      @request_list.export
+    end
+
+    private
+
+    def export
+      File.write(EXPORT_ACCESSED_LIST_PATH, @accessed_list.join("\n"))
+      File.write(EXPORT_MANUAL_LIST_PATH, @manual_list.join("\n"))
+    end
+
+    def add_result(to: , request: , code: nil)
       case to
       when :accessed_list
         puts code
-        @accessed_list << [hash, code].join(',')
+        @accessed_list << [request.to_hash, code].join(',')
       when :manual_list
-        @manual_list << hash
+        @manual_list << request.to_hash
       else
         raise 'bug!!'
       end
