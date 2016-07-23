@@ -7,6 +7,7 @@ require 'digest/md5'
 #
 # parallel
 # UAをリクエストンに含める
+# request_listからロードする
 
 module SugoiHttpRequestTester
   EXPORT_REQUEST_LIST_PATH =  'output/request_list'
@@ -57,7 +58,7 @@ module SugoiHttpRequestTester
   end
 
   class Runner
-    def initialize(host: , limit: nil, basic_auth: nil, logs_path: nil, block: nil)
+    def initialize(host: , limit: nil, basic_auth: nil, logs_path: nil)
       @host = host
       @accessed_list = []
       @manual_list = []
@@ -65,16 +66,11 @@ module SugoiHttpRequestTester
       @basic_auth = basic_auth
       @logs_path = logs_path
       @request_list = RequestList.new
-      @line_parser_block =
-        if block
-          block
-        else
-          ->(line) {
-            /({.*})/ =~ line
-            json = JSON.parse($1)
-            { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
-          }
-        end
+      @line_parser_block = ->(line) {
+        /({.*})/ =~ line
+        json = JSON.parse($1)
+        { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
+      }
     end
 
     def load_and_run
@@ -112,6 +108,10 @@ module SugoiHttpRequestTester
       @request_list.export
     end
 
+    def set_line_parse_block=(block)
+      @line_parser_block = block
+    end
+
     private
 
     def export
@@ -142,7 +142,7 @@ module SugoiHttpRequestTester
     end
   end
 
-  def self.new(host:, limit: nil, basic_auth: nil, logs_path:, &block)
-    Runner.new(host: host, limit: limit, basic_auth: basic_auth, logs_path: logs_path, block: block)
+  def self.new(host:, limit: nil, basic_auth: nil, logs_path: )
+    Runner.new(host: host, limit: limit, basic_auth: basic_auth, logs_path: logs_path)
   end
 end
