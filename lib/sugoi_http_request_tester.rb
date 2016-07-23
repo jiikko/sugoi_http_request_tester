@@ -2,6 +2,7 @@ require "sugoi_http_request_tester/version"
 require 'json'
 require 'net/http'
 require 'digest/md5'
+require 'forwardable'
 
 # load_request_list をexportする. ログから抽出して次回起動から高速にするため
 #
@@ -15,6 +16,10 @@ module SugoiHttpRequestTester
   EXPORT_MANUAL_LIST_PATH =   'output/manual_list'
 
   class RequestList
+    extend Forwardable
+
+    def_delegators :@requests, :size, :clear
+
     def initialize
       @requests = {}
     end
@@ -32,8 +37,10 @@ module SugoiHttpRequestTester
       File.write(EXPORT_REQUEST_LIST_PATH, text)
     end
 
-    def clear
-      @requests = {}
+    def each(&block)
+      @requests.each do |_hash, request|
+        yield request
+      end
     end
   end
 
@@ -79,7 +86,7 @@ module SugoiHttpRequestTester
     end
 
     def run
-      @request_list.requests.each do |request|
+      @request_list.each do |request|
         if /GET/ =~ request.method
           Net::HTTP.start(@host) do |http|
             req = Net::HTTP::Get.new(request.path)
