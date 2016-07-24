@@ -13,6 +13,7 @@ module SugoiHttpRequestTester
             end
           rescue Exception => e
             puts e.message
+            puts e.backtrace.join("\n")
           end
         end
       end
@@ -31,6 +32,10 @@ module SugoiHttpRequestTester
     def join
       @threads.each { |x| @queue.push(nil) }
       @threads.each(&:join)
+    end
+
+    def size
+      @threads.size
     end
   end
 end

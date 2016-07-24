@@ -17,19 +17,24 @@ module SugoiHttpRequestTester
     end
 
     def run
+      if @thread_list.size <= 1
+        sequential_run
+      else
+        concurrent_run
+      end
+    end
+
+    def sequential_run
       @request_list.each do |request|
-        if /GET/ =~ request.method
-          @thread_list.push_queue do
-            Net::HTTP.start(@host) do |http|
-              req = Net::HTTP::Get.new(request.path)
-              req.add_field('User-Agent', request.user_agent) unless request.user_agent.nil?
-              req.basic_auth *@basic_auth unless @basic_auth.nil?
-              response = http.request(req)
-              add_result(to: :accessed_list, request: request, code: response.code)
-            end
-          end
-        else
-          add_result(to: :manual_list, request: request)
+        add_result(request.run(host: @host, basic_auth: @basic_auth))
+      end
+      export
+    end
+
+    def concurrent_run
+      @request_list.each do |request|
+        @thread_list.push_queue do
+        add_result(request.run(host: @host, basic_auth: @basic_auth))
         end
       end
       @thread_list.join
