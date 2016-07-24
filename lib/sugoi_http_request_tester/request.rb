@@ -2,6 +2,10 @@ module SugoiHttpRequestTester
   class Request
     attr_accessor :method, :user_agent, :path
 
+    class << self
+      attr_accessor :host, :basic_auth
+    end
+
     def initialize(method: , user_agent: , path: )
       @method = method
       @user_agent = user_agent
@@ -22,12 +26,12 @@ module SugoiHttpRequestTester
       }.to_json
     end
 
-    def run(host: , basic_auth: nil)
+    def run
       if /GET/ =~ method
-        Net::HTTP.start(host) do |http|
+        Net::HTTP.start(self.class.host) do |http|
           req = Net::HTTP::Get.new(path)
           req.add_field('User-Agent', user_agent) unless user_agent.nil?
-          req.basic_auth *basic_auth unless basic_auth.nil?
+          req.basic_auth *self.class.basic_auth unless self.class.basic_auth.nil?
           response = http.request(req)
           { to: :accessed_list, request: self, code: response.code }
         end

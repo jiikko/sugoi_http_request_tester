@@ -1,14 +1,14 @@
 module SugoiHttpRequestTester
   class Runner
     def initialize(options = {})
-      @host = options[:host]
       @accessed_list = []
       @manual_list = []
-      @basic_auth = options[:basic_auth]
       @logs_path = options[:logs_path]
       @request_list = RequestList.new(limit: options[:limit])
       @line_parser_block = json_parse_block
       @thread_list = ThreadList.new(options[:concurrency])
+      Request.host = options[:host]
+      Request.basic_auth = options[:basic_auth]
     end
 
     def load_and_run
@@ -26,7 +26,7 @@ module SugoiHttpRequestTester
 
     def sequential_run
       @request_list.each do |request|
-        add_result(request.run(host: @host, basic_auth: @basic_auth))
+        add_result(request.run)
       end
       export
     end
@@ -34,7 +34,7 @@ module SugoiHttpRequestTester
     def concurrent_run
       @request_list.each do |request|
         @thread_list.push_queue do
-        add_result(request.run(host: @host, basic_auth: @basic_auth))
+        add_result(request.run)
         end
       end
       @thread_list.join
