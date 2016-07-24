@@ -8,7 +8,7 @@ module SugoiHttpRequestTester
       @logs_path = options[:logs_path]
       @request_list = RequestList.new(limit: options[:limit])
       @line_parser_block = json_parse_block
-      @thread_list = ThreadList.new(5)
+      @thread_list = ThreadList.new(options[:concurrency])
     end
 
     def load_and_run

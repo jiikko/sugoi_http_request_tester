@@ -19,6 +19,7 @@ describe SugoiHttpRequestTester do
         limit: 100,
         basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
         logs_path: 'spec/logs/*',
+        concurrency: 3,
       )
       tester.set_line_parse_block = ->(line){
         /({.*})/ =~ line
