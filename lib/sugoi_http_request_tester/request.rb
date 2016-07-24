@@ -1,6 +1,5 @@
 module SugoiHttpRequestTester
   class Request
-    attr_accessor :method, :user_agent, :path
 
     class << self
       attr_accessor :host, :basic_auth
@@ -27,16 +26,32 @@ module SugoiHttpRequestTester
     end
 
     def run
-      if /GET/ =~ method
+      if /GET/ =~ @method
         Net::HTTP.start(self.class.host) do |http|
-          req = Net::HTTP::Get.new(path)
-          req.add_field('User-Agent', user_agent) unless user_agent.nil?
+          req = Net::HTTP::Get.new(@path)
+          req.add_field('User-Agent', normalized_user_agent[user_agent_type]) unless @user_agent.nil?
           req.basic_auth *self.class.basic_auth unless self.class.basic_auth.nil?
           response = http.request(req)
           { to: :accessed_list, request: self, code: response.code }
         end
       else
         { to: :manual_list, request: self }
+      end
+    end
+
+    private
+
+    def normalized_user_agent
+      { pc: "sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
+        sp: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36 sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
+      }
+    end
+
+    def user_agent_type
+      if @user_agent =~ /iPhone|Android|Mobile|Windows Phone/
+        :sp
+      else
+        :pc
       end
     end
   end

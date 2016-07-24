@@ -23,7 +23,7 @@ Or install it yourself as:
 tester = SugoiHttpRequestTester.new(
   host: 'example.com',
   limit: 100,
-  logs_path: 'spec/logs/*',
+  logs_path: 'logs/*',
   concurrency: 3,
 )
 tester.set_line_parse_block = ->(line){
