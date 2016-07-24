@@ -4,11 +4,8 @@ require 'net/http'
 require 'digest/md5'
 require 'forwardable'
 
-# load_request_list をexportする. ログから抽出して次回起動から高速にするため
-#
 # parallel
-# UAをリクエストンに含める
-# request_listからロードする
+# https
 
 module SugoiHttpRequestTester
   EXPORT_REQUEST_LIST_PATH =  'output/request_list'
@@ -90,6 +87,7 @@ module SugoiHttpRequestTester
         if /GET/ =~ request.method
           Net::HTTP.start(@host) do |http|
             req = Net::HTTP::Get.new(request.path)
+            req.add_field('User-Agent', request.user_agent) unless request.user_agent.nil?
             req.basic_auth *@basic_auth unless @basic_auth.nil?
             response = http.request(req)
             add_result(to: :accessed_list, request: request, code: response.code)
