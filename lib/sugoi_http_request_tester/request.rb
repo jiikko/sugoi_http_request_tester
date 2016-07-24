@@ -17,7 +17,7 @@ module SugoiHttpRequestTester
 
     def to_json
       { method: @method,
-        user_agent: @user_agent,
+        user_agent: normalized_user_agent,
         path: @path,
         mt: @method,
         ua: @user_agent,
@@ -29,7 +29,7 @@ module SugoiHttpRequestTester
       if /GET/ =~ @method
         Net::HTTP.start(self.class.host) do |http|
           req = Net::HTTP::Get.new(@path)
-          req.add_field('User-Agent', normalized_user_agent[user_agent_type]) unless @user_agent.nil?
+          req.add_field('User-Agent', normalized_user_agent) unless @user_agent.nil?
           req.basic_auth *self.class.basic_auth unless self.class.basic_auth.nil?
           response = http.request(req)
           { to: :accessed_list, request: self, code: response.code }
@@ -44,7 +44,7 @@ module SugoiHttpRequestTester
     def normalized_user_agent
       { pc: "sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
         sp: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36 sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
-      }
+      }[user_agent_type]
     end
 
     def user_agent_type

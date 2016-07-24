@@ -62,7 +62,7 @@ describe SugoiHttpRequestTester do
 {"mt":"GET","pt":"/index.html","ua":"ddd"}
 {"mt":"GET","pt":"/index2.html","ua":"ddd"}
 {"mt":"GET","pt":"/index2.html","ua":"ddd"}
-{"mt":"GET","pt":"/index3.html","ua":"ddd"}
+{"mt":"GET","pt":"/index3.html","ua":"Mobile"}
       LOG
       File.write('spec/logs/log1', log)
       tester = SugoiHttpRequestTester.new(
