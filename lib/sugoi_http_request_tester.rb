@@ -17,12 +17,21 @@ module SugoiHttpRequestTester
 
     def_delegators :@requests, :size, :clear
 
-    def initialize
+    def initialize(limit: nil)
       @requests = {}
+      if limit.is_a?(Numeric)
+        @limit = limit
+        @limit_counter = 0
+      end
     end
 
     def <<(request)
-      @requests[request.hash] = request
+      if under_limit?
+        @requests[request.hash] = request
+        true
+      else
+        false
+      end
     end
 
     def requests
@@ -37,6 +46,15 @@ module SugoiHttpRequestTester
     def each(&block)
       @requests.each do |_hash, request|
         yield request
+      end
+    end
+
+    private
+
+    def under_limit?
+      if @limit.is_a?(Numeric)
+        @limit_counter += 1
+        @limit_counter <= @limit
       end
     end
   end
@@ -70,10 +88,9 @@ module SugoiHttpRequestTester
       @host = host
       @accessed_list = []
       @manual_list = []
-      @limit = limit
       @basic_auth = basic_auth
       @logs_path = logs_path
-      @request_list = RequestList.new
+      @request_list = RequestList.new(limit: limit)
       @line_parser_block = json_parse_block
     end
 
@@ -103,16 +120,14 @@ module SugoiHttpRequestTester
       Dir.glob(@logs_path).each do |file_name|
         next if /\.gz$/ =~ file_name
         File.open(file_name).each_line do |line|
-          @request_list << Request.new(@line_parser_block.call(line))
-          break if countup_and_limit?
+          break unless @request_list << Request.new(@line_parser_block.call(line))
         end
       end
     end
 
     def load_exported_request_list
       File.open(EXPORT_REQUEST_LIST_PATH).each_line do |line|
-        @request_list << Request.new(json_parse_block.call(line))
-        break if countup_and_limit?
+        break unless @request_list << Request.new(json_parse_block.call(line))
       end
     end
 
@@ -144,16 +159,6 @@ module SugoiHttpRequestTester
         @manual_list << request.to_json
       else
         raise 'bug!!'
-      end
-    end
-
-    def countup_and_limit?
-      if @limit_counter.nil? && @limit.is_a?(Numeric)
-        @limit_counter = 0
-      end
-      if @limit.is_a?(Numeric)
-        @limit_counter += 1
-        @limit_counter > @limit
       end
     end
 

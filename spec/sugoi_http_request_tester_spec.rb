@@ -31,6 +31,31 @@ describe SugoiHttpRequestTester do
     end
   end
 
+  describe 'limit' do
+    it 'be to enable limit feature' do
+      log = <<-LOG
+{"mt":"GET","pt":"/index.html","ua":"ddd"}
+{"mt":"GET","pt":"/index2.html","ua":"ddd"}
+{"mt":"GET","pt":"/index2.html","ua":"ddd"}
+{"mt":"GET","pt":"/index3.html","ua":"ddd"}
+      LOG
+      File.write('spec/logs/log1', log)
+      tester = SugoiHttpRequestTester.new(
+        host: 'example.com',
+        limit: 1,
+        basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
+        logs_path: 'spec/logs/*',
+      )
+      tester.set_line_parse_block = ->(line){
+        /({.*})/ =~ line
+        json = JSON.parse($1)
+        { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
+      }
+      tester.load_logs
+      expect(tester.instance_eval { @request_list.size }).to eq 1
+    end
+  end
+
   describe '#export_request_list' do
     it 'exportすること' do
       log = <<-LOG
