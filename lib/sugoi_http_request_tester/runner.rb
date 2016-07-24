@@ -36,7 +36,7 @@ module SugoiHttpRequestTester
       export
     end
 
-    def load_logs
+    def import_logs
       Dir.glob(@logs_path).each do |file_name|
         next if /\.gz$/ =~ file_name
         File.open(file_name).each_line do |line|
@@ -45,7 +45,7 @@ module SugoiHttpRequestTester
       end
     end
 
-    def load_exported_request_list
+    def import_exported_request_list
       File.open(EXPORT_REQUEST_LIST_PATH).each_line do |line|
         break unless @request_list << Request.new(json_parse_block.call(line))
       end

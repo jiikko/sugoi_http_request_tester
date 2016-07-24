@@ -26,7 +26,7 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.load_logs
+      tester.import_logs
       tester.run
       expect(tester.instance_eval { @request_list.size }).to eq 3
     end
@@ -44,7 +44,6 @@ describe SugoiHttpRequestTester do
       tester = SugoiHttpRequestTester.new(
         host: 'example.com',
         limit: 1,
-        basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
         logs_path: 'spec/logs/*',
       )
       tester.set_line_parse_block = ->(line){
@@ -52,7 +51,7 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.load_logs
+      tester.import_logs
       expect(tester.instance_eval { @request_list.size }).to eq 1
     end
   end
@@ -69,7 +68,6 @@ describe SugoiHttpRequestTester do
       tester = SugoiHttpRequestTester.new(
         host: 'example.com',
         limit: 100,
-        basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
         logs_path: 'spec/logs/*',
       )
       tester.set_line_parse_block = ->(line){
@@ -77,12 +75,12 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.load_logs
+      tester.import_logs
       tester.export_request_list
       expect(File.open(SugoiHttpRequestTester::EXPORT_REQUEST_LIST_PATH).readlines.size).to eq 3
       tester.clear_request_list
       expect(tester.instance_eval { @request_list.size }).to eq 0
-      tester.load_exported_request_list
+      tester.import_exported_request_list
       expect(tester.instance_eval { @request_list.size }).to eq 3
     end
   end
