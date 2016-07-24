@@ -11,11 +11,6 @@ module SugoiHttpRequestTester
       Request.basic_auth = options[:basic_auth]
     end
 
-    def load_and_run
-      load_logs
-      run
-    end
-
     def run
       if @thread_list.size <= 1
         sequential_run
