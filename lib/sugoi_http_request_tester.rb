@@ -12,9 +12,10 @@ require 'forwardable'
 # https
 
 module SugoiHttpRequestTester
-  EXPORT_REQUEST_LIST_PATH =  'output/request_list'
-  EXPORT_ACCESSED_LIST_PATH = 'output/accessed_list'
-  EXPORT_MANUAL_LIST_PATH =   'output/manual_list'
+  EXPORT_BASE_DIR = 'output'
+  EXPORT_REQUEST_LIST_PATH =  "#{EXPORT_BASE_DIR}/request_list"
+  EXPORT_ACCESSED_LIST_PATH = "#{EXPORT_BASE_DIR}/accessed_list"
+  EXPORT_MANUAL_LIST_PATH =   "#{EXPORT_BASE_DIR}/manual_list"
 
   def self.new(host:, limit: nil, basic_auth: nil, logs_path: , concurrency: 1)
     Runner.new(host: host,

@@ -66,6 +66,7 @@ module SugoiHttpRequestTester
     private
 
     def export
+      Dir.mkdir(EXPORT_BASE_DIR) unless File.exists?(EXPORT_BASE_DIR)
       File.write(EXPORT_ACCESSED_LIST_PATH, @accessed_list.join("\n"))
       File.write(EXPORT_MANUAL_LIST_PATH, @manual_list.join("\n"))
     end
