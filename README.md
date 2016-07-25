@@ -20,11 +20,14 @@ Or install it yourself as:
 
 ## Usage
 ```ruby
+require 'sugoi_http_request_tester'
+
 tester = SugoiHttpRequestTester.new(
   host: 'example.com',
-  limit: 100,
-  logs_path: 'logs/*',
-  concurrency: 3,
+  limit: 10000,
+  logs_path: 'logs_source/*',
+  basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
+  concurrency: 10,
 )
 tester.set_line_parse_block = ->(line){
   /({.*})/ =~ line
@@ -32,6 +35,7 @@ tester.set_line_parse_block = ->(line){
   { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
 }
 tester.import_logs
+tester.export_request_list
 tester.run
 ```
 
