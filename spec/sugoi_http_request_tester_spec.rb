@@ -57,6 +57,34 @@ describe SugoiHttpRequestTester do
   end
 
   describe '#export_request_list' do
+    context 'when unset limit' do
+      it 'exportすること' do
+        log = <<-LOG
+{"mt":"GET","pt":"/index.html","ua":"ddd"}
+{"mt":"GET","pt":"/index2.html","ua":"ddd"}
+{"mt":"GET","pt":"/index2.html","ua":"ddd"}
+{"mt":"GET","pt":"/index3.html","ua":"Mobile"}
+        LOG
+        File.write('spec/logs/log1', log)
+        tester = SugoiHttpRequestTester.new(
+          host: 'example.com',
+          logs_path: 'spec/logs/*',
+        )
+        tester.set_line_parse_block = ->(line){
+          /({.*})/ =~ line
+          json = JSON.parse($1)
+          { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
+        }
+        tester.import_logs
+        tester.export_request_list
+        expect(File.open(SugoiHttpRequestTester::EXPORT_REQUEST_LIST_PATH).readlines.size).to eq 3
+        tester.clear_request_list
+        expect(tester.instance_eval { @request_list.size }).to eq 0
+        tester.import_exported_request_list
+        expect(tester.instance_eval { @request_list.size }).to eq 3
+      end
+    end
+
     it 'exportすること' do
       log = <<-LOG
 {"mt":"GET","pt":"/index.html","ua":"ddd"}

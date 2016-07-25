@@ -42,6 +42,8 @@ module SugoiHttpRequestTester
       if @limit.is_a?(Numeric)
         @limit_counter += 1
         @limit_counter <= @limit
+      else
+        true
       end
     end
   end
