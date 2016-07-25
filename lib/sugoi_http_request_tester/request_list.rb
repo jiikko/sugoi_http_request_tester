@@ -26,7 +26,6 @@ module SugoiHttpRequestTester
     end
 
     def export
-      Dir.mkdir(EXPORT_BASE_DIR) unless File.exists?(EXPORT_BASE_DIR)
       text = requests.map { |request| request.to_json }.join("\n")
       File.write(EXPORT_REQUEST_LIST_PATH, text)
     end

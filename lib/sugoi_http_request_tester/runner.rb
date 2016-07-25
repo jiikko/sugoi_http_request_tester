@@ -1,17 +1,18 @@
 module SugoiHttpRequestTester
   class Runner
     def initialize(options = {})
-      @accessed_list = []
-      @manual_list = []
       @logs_path = options[:logs_path]
       @request_list = RequestList.new(limit: options[:limit])
       @line_parser_block = json_parse_block
       @thread_list = ThreadList.new(options[:concurrency])
       Request.host = options[:host]
       Request.basic_auth = options[:basic_auth]
+      Dir.mkdir(EXPORT_BASE_DIR) unless File.exists?(EXPORT_BASE_DIR)
     end
 
     def run
+      File.write(EXPORT_ACCESSED_LIST_PATH, '')
+      File.write(EXPORT_MANUAL_LIST_PATH, '')
       if @thread_list.size <= 1
         sequential_run
       else
@@ -23,17 +24,13 @@ module SugoiHttpRequestTester
       @request_list.each do |request|
         add_result(request.run)
       end
-      export
     end
 
     def concurrent_run
       @request_list.each do |request|
-        @thread_list.push_queue do
-        add_result(request.run)
-        end
+        @thread_list.push_queue { add_result(request.run) }
       end
       @thread_list.join
-      export
     end
 
     def import_logs
@@ -65,20 +62,18 @@ module SugoiHttpRequestTester
 
     private
 
-    def export
-      Dir.mkdir(EXPORT_BASE_DIR) unless File.exists?(EXPORT_BASE_DIR)
-      File.write(EXPORT_ACCESSED_LIST_PATH, @accessed_list.join("\n"))
-      File.write(EXPORT_MANUAL_LIST_PATH, @manual_list.join("\n"))
-    end
-
     def add_result(to: , request: , code: nil)
       @thread_list.mutex_synchronize do
         case to
         when :accessed_list
           puts code
-          @accessed_list << [request.to_json, code].join(',')
+          File.open(EXPORT_ACCESSED_LIST_PATH, 'a') do |f|
+            f.puts([request.to_json, code].join(','))
+          end
         when :manual_list
-          @manual_list << request.to_json
+          File.open(EXPORT_MANUAL_LIST_PATH, 'a') do |f|
+            f.puts(request.to_json)
+          end
         else
           raise 'bug!!'
         end
