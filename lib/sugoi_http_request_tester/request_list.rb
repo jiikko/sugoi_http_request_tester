@@ -25,11 +25,6 @@ module SugoiHttpRequestTester
       @requests.values
     end
 
-    def export
-      text = requests.map { |request| request.to_json }.join("\n")
-      File.write(EXPORT_REQUEST_LIST_PATH, text)
-    end
-
     def each(&block)
       @requests.each do |_hash, request|
         yield request

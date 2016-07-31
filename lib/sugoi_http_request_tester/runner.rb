@@ -52,8 +52,8 @@ module SugoiHttpRequestTester
       @request_list.clear
     end
 
-    def export_request_list
-      @request_list.export
+    def export_request_list(per: nil, limit: nil)
+      RequestList::Exporter.new(requests: @request_list.requests, per: per, limit: limit).export
     end
 
     def set_line_parse_block=(block)

@@ -54,7 +54,6 @@ describe SugoiHttpRequestTester do
       }
       tester.import_logs
       tester.run
-      binding.pry
       expect(File.open(SugoiHttpRequestTester::EXPORT_MANUAL_LIST_PATH).readlines.size).to eq 1
     end
   end
@@ -137,6 +136,11 @@ describe SugoiHttpRequestTester do
       expect(tester.instance_eval { @request_list.size }).to eq 0
       tester.import_exported_request_list
       expect(tester.instance_eval { @request_list.size }).to eq 3
+    end
+  end
+
+  describe '#parted_export_request_list' do
+    it 'parted_exportすること' do
     end
   end
 end

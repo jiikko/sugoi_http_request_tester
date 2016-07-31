@@ -1,5 +1,6 @@
 require "sugoi_http_request_tester/version"
 require "sugoi_http_request_tester/request_list"
+require "sugoi_http_request_tester/request_list/exporter"
 require "sugoi_http_request_tester/request"
 require "sugoi_http_request_tester/thread_list"
 require "sugoi_http_request_tester/runner"
