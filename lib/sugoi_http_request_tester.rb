@@ -8,6 +8,7 @@ require 'json'
 require 'net/http'
 require 'digest/md5'
 require 'forwardable'
+require 'tempfile'
 
 # Todo
 # https
