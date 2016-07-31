@@ -29,16 +29,16 @@ module SugoiHttpRequestTester
     def per_export
       requests_list = []
       @limit_part_files_count.times do
-        requests = []
+        temp_requests = []
         @per.times do
-          request = requests.pop
-          request ? (requests << request) : break
+          request = @requests.pop
+          request ? (temp_requests << request) : break
         end
-        requests.empty? ? break : requests_list << requests
+        temp_requests.empty? ? break : requests_list << temp_requests
       end
       @export_files = requests_list.map do |requests|
         tempfile = Tempfile.new('per_export')
-        File.wrie(tempfile.path,
+        File.write(tempfile.path,
                   requests.map { |request| request.to_json }.join("\n"))
         puts tempfile.path
         tempfile

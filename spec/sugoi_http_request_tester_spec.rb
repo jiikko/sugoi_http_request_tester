@@ -82,7 +82,7 @@ describe SugoiHttpRequestTester do
     end
   end
 
-  describe '#export_request_list' do
+  describe '#export_request_list!' do
     context 'when unset limit' do
       it 'exportすること' do
         log = <<-LOG
@@ -102,7 +102,7 @@ describe SugoiHttpRequestTester do
           { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
         }
         tester.import_logs
-        tester.export_request_list
+        tester.export_request_list!
         expect(File.open(SugoiHttpRequestTester::EXPORT_REQUEST_LIST_PATH).readlines.size).to eq 3
         tester.clear_request_list
         expect(tester.instance_eval { @request_list.size }).to eq 0
@@ -130,7 +130,7 @@ describe SugoiHttpRequestTester do
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
       tester.import_logs
-      tester.export_request_list
+      tester.export_request_list!
       expect(tester.request_list_export_files.size).to eq 1
       export_file = tester.request_list_export_files.first
       expect(export_file.readlines.size).to eq 3
@@ -163,6 +163,9 @@ describe SugoiHttpRequestTester do
       { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
     }
     tester.import_logs
-    tester.export_request_list(per: 2, limit_part_files_count: 1)
+    tester.export_request_list!(per: 2, limit_part_files_count: 1)
+    expect(tester.instance_eval { @request_list.size }).to eq 5
+    binding.pry
+    tester.request_list_export_files
   end
 end

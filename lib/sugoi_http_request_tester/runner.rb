@@ -52,10 +52,10 @@ module SugoiHttpRequestTester
       @request_list.clear
     end
 
-    def export_request_list(per: nil, limit_part_files_count: nil)
+    def export_request_list!(per: nil, limit_part_files_count: nil)
       @exporter = RequestList::Exporter.new(requests: @request_list.requests,
-                                per: per,
-                                limit_part_files_count: limit_part_files_count)
+                                            per: per,
+                                            limit_part_files_count: limit_part_files_count)
       @exporter.export
     end
 
