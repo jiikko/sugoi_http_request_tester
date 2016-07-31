@@ -1,5 +1,5 @@
 module SugoiHttpRequestTester
-  class RequestList::Exporter
+  class RequestSet::Exporter
     def initialize(requests: , per: nil, limit_part_files_count: nil)
       @requests = requests
       @per = per
@@ -28,10 +28,11 @@ module SugoiHttpRequestTester
 
     def per_export
       requests_list = []
+      sorted_requests = SortedRequestList.new(@requests)
       @limit_part_files_count.times do
         temp_requests = []
         @per.times do
-          request = @requests.pop
+          request = sorted_requests.pop
           request ? (temp_requests << request) : break
         end
         temp_requests.empty? ? break : requests_list << temp_requests
@@ -43,6 +44,11 @@ module SugoiHttpRequestTester
         puts tempfile.path
         tempfile
       end
+    end
+
+    # 1つのperにパラメータ違いの似たURLが固まらないようにバラす
+    def sort_by_url(requests)
+      groued_lis = requests.group_by { |request| request.url =~ %r!([\w\d\-_]+)!; $1 }
     end
 
     def bulk_export

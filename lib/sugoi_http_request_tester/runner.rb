@@ -2,7 +2,7 @@ module SugoiHttpRequestTester
   class Runner
     def initialize(options = {})
       @logs_path = options[:logs_path]
-      @request_list = RequestList.new(limit: options[:limit])
+      @request_list = RequestSet.new(limit: options[:limit])
       @line_parser_block = json_parse_block
       @thread_list = ThreadList.new(options[:concurrency])
       Request.host = options[:host]
@@ -53,7 +53,7 @@ module SugoiHttpRequestTester
     end
 
     def export_request_list!(per: nil, limit_part_files_count: nil)
-      @exporter = RequestList::Exporter.new(requests: @request_list.requests,
+      @exporter = RequestSet::Exporter.new(requests: @request_list.requests,
                                             per: per,
                                             limit_part_files_count: limit_part_files_count)
       @exporter.export

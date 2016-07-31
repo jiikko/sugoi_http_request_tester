@@ -1,5 +1,5 @@
 module SugoiHttpRequestTester
-  class RequestList
+  class RequestSet
     extend Forwardable
 
     def_delegators :@requests, :size, :clear

@@ -1,5 +1,6 @@
 module SugoiHttpRequestTester
   class Request
+    attr_accessor :path
 
     class << self
       attr_accessor :host, :basic_auth

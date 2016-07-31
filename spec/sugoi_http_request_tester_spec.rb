@@ -150,6 +150,12 @@ describe SugoiHttpRequestTester do
 {"mt":"GET","pt":"/index4.html","ua":"Mobile"}
 {"mt":"GET","pt":"/index4.html","ua":"Mobile"}
 {"mt":"GET","pt":"/index5.html","ua":"Mobile"}
+{"mt":"GET","pt":"/help/index1.html","ua":"Mobile"}
+{"mt":"GET","pt":"/help/index2.html","ua":"Mobile"}
+{"mt":"GET","pt":"/help/index5.html","ua":"Mobile"}
+{"mt":"GET","pt":"/info/index3.html","ua":"Mobile"}
+{"mt":"GET","pt":"/info/index4.html","ua":"Mobile"}
+{"mt":"GET","pt":"/info/index6.html","ua":"Mobile"}
     LOG
     File.write('spec/logs/log1', log)
     tester = SugoiHttpRequestTester.new(
@@ -163,9 +169,20 @@ describe SugoiHttpRequestTester do
       { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
     }
     tester.import_logs
-    tester.export_request_list!(per: 2, limit_part_files_count: 1)
-    expect(tester.instance_eval { @request_list.size }).to eq 5
-    binding.pry
-    tester.request_list_export_files
+    # per カウントの確認
+    tester.export_request_list!(per: 2, limit_part_files_count: 3)
+    expect(tester.instance_eval { @request_list.size }).not_to eq 0
+    expect(tester.request_list_export_files.size).to eq 3
+    tester.request_list_export_files.each do |file|
+      expect(file.readlines.size).to eq 2
+      file.unlink
+    end
+    # URLが均等になっているかの確認
+    tester.export_request_list!(per: 7, limit_part_files_count: 4)
+    expect(tester.instance_eval { @request_list.size }).not_to eq 0
+    expect(tester.request_list_export_files.size).to eq 2
+    tester.request_list_export_files.each do |file|
+      file.unlink
+    end
   end
 end
