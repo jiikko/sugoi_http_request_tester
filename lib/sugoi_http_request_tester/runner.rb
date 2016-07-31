@@ -1,4 +1,6 @@
 module SugoiHttpRequestTester
+  attr_reader :request_list_export_paths
+
   class Runner
     def initialize(options = {})
       @logs_path = options[:logs_path]
@@ -52,8 +54,15 @@ module SugoiHttpRequestTester
       @request_list.clear
     end
 
-    def export_request_list(per: nil, limit: nil)
-      RequestList::Exporter.new(requests: @request_list.requests, per: per, limit: limit).export
+    def export_request_list(per: nil, limit_part_files_count: nil)
+      @exporter = RequestList::Exporter.new(requests: @request_list.requests,
+                                per: per,
+                                limit_part_files_count: limit_part_files_count)
+      @exporter.export
+    end
+
+    def request_list_export_paths
+      @exporter.export_paths
     end
 
     def set_line_parse_block=(block)
