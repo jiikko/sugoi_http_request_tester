@@ -34,6 +34,7 @@ module SugoiHttpRequestTester
     end
 
     def import_logs
+      clear_request_list!
       Dir.glob(@logs_path).each do |file_name|
         next if /\.gz$/ =~ file_name
         File.open(file_name).each_line do |line|
