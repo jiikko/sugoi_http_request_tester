@@ -26,6 +26,7 @@ module SugoiHttpRequestTester
 
     private
 
+    # should unlink to tempfile.
     def per_export
       requests_list = []
       sorted_requests = SortedRequestList.new(@requests)
