@@ -145,11 +145,11 @@ describe SugoiHttpRequestTester do
     log = <<-LOG
 {"mt":"GET","pt":"/index.html","ua":"ddd"}
 {"mt":"GET","pt":"/index2.html","ua":"ddd"}
-{"mt":"GET","pt":"/index2.html","ua":"ddd"}
-{"mt":"GET","pt":"/index3.html","ua":"Mobile"}
-{"mt":"GET","pt":"/index4.html","ua":"Mobile"}
-{"mt":"GET","pt":"/index4.html","ua":"Mobile"}
-{"mt":"GET","pt":"/index5.html","ua":"Mobile"}
+{"mt":"GET","pt":"/events/index2.html","ua":"ddd"}
+{"mt":"GET","pt":"/events/index3.html","ua":"Mobile"}
+{"mt":"GET","pt":"/events/index4.html","ua":"Mobile"}
+{"mt":"GET","pt":"/events/index41.html","ua":"Mobile"}
+{"mt":"GET","pt":"/events/index5.html","ua":"Mobile"}
 {"mt":"GET","pt":"/help/index1.html","ua":"Mobile"}
 {"mt":"GET","pt":"/help/index2.html","ua":"Mobile"}
 {"mt":"GET","pt":"/help/index5.html","ua":"Mobile"}
@@ -178,11 +178,19 @@ describe SugoiHttpRequestTester do
       file.unlink
     end
     # URLが均等になっているかの確認
-    tester.export_request_list!(per: 7, limit_part_files_count: 4)
+    tester.export_request_list!(per: 3, limit_part_files_count: 4)
     expect(tester.instance_eval { @request_list.size }).not_to eq 0
-    expect(tester.request_list_export_files.size).to eq 2
-    tester.request_list_export_files.each do |file|
-      file.unlink
-    end
+    expect(tester.request_list_export_files.size).to eq 4
+    file = tester.request_list_export_files[0]
+    texts = file.readlines
+    expect(JSON.parse(texts[0])['path']).to eq "/index.html"
+    expect(JSON.parse(texts[1])['path']).to eq "/events/index5.html"
+    expect(JSON.parse(texts[2])['path']).to eq "/help/index5.html"
+    file = tester.request_list_export_files[1]
+    texts = file.readlines
+    expect(JSON.parse(texts[0])['path']).to eq "/info/index6.html"
+    expect(JSON.parse(texts[1])['path']).to eq "/index2.html"
+    expect(JSON.parse(texts[2])['path']).to eq "/help/index2.html"
+    tester.request_list_export_files.map(&:unlink)
   end
 end
