@@ -42,13 +42,21 @@ module SugoiHttpRequestTester
       end
     end
 
-    def import_exported_request_list
+    def import_request_list_from_file
+      clear_request_list!
       File.open(EXPORT_REQUEST_LIST_PATH).each_line do |line|
         break unless @request_list << Request.new(json_parse_block.call(line))
       end
     end
 
-    def clear_request_list
+    def import_request_list_from(list)
+      clear_request_list!
+      list.each do |hash|
+        @request_list << Request.new(hash)
+      end
+    end
+
+    def clear_request_list!
       @request_list.clear
     end
 

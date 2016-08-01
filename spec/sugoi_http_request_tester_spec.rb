@@ -104,9 +104,9 @@ describe SugoiHttpRequestTester do
         tester.import_logs
         tester.export_request_list!
         expect(File.open(SugoiHttpRequestTester::EXPORT_REQUEST_LIST_PATH).readlines.size).to eq 3
-        tester.clear_request_list
+        tester.clear_request_list!
         expect(tester.instance_eval { @request_list.size }).to eq 0
-        tester.import_exported_request_list
+        tester.import_request_list_from_file
         expect(tester.instance_eval { @request_list.size }).to eq 3
       end
     end
@@ -134,9 +134,9 @@ describe SugoiHttpRequestTester do
       expect(tester.request_list_export_files.size).to eq 1
       export_file = tester.request_list_export_files.first
       expect(export_file.readlines.size).to eq 3
-      tester.clear_request_list
+      tester.clear_request_list!
       expect(tester.instance_eval { @request_list.size }).to eq 0
-      tester.import_exported_request_list
+      tester.import_request_list_from_file
       expect(tester.instance_eval { @request_list.size }).to eq 3
     end
   end
