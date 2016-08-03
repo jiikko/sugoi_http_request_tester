@@ -16,14 +16,18 @@ module SugoiHttpRequestTester
       Digest::MD5.hexdigest([@method, @user_agent, @path].join)
     end
 
-    def to_json
+    def to_hash
       { method: @method,
         user_agent: normalized_user_agent,
         path: @path,
         mt: @method,
         ua: @user_agent,
         pt: @path,
-      }.to_json
+      }
+    end
+
+    def to_json
+      to_hash.to_json
     end
 
     def run
