@@ -76,7 +76,7 @@ module SugoiHttpRequestTester
       @thread_list.join
     end
 
-    def import_logs
+    def import_logs!
       clear_request_list!
       Dir.glob(@logs_path).each do |file_name|
         next if /\.gz$/ =~ file_name
@@ -104,15 +104,12 @@ module SugoiHttpRequestTester
       @request_list.clear
     end
 
-    def export_request_list!(per: nil, limit_part_files_count: nil)
+    def export_request_list!(per: nil, export_format: :file, limit_part_count: nil)
       @exporter = RequestSet::Exporter.new(requests: @request_list.requests,
                                             per: per,
-                                            limit_part_files_count: limit_part_files_count)
-      @exporter.export
-    end
-
-    def request_list_export_files
-      @exporter.export_files
+                                            export_format: export_format,
+                                            limit_part_count: limit_part_count)
+      @exporter.results
     end
 
     def set_line_parse_block=(block)

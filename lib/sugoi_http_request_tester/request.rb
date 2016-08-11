@@ -23,6 +23,7 @@ module SugoiHttpRequestTester
         mt: @method,
         ua: @user_agent,
         pt: @path,
+        device_type: user_agent_type,
       }
     end
 

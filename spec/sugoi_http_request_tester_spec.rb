@@ -28,7 +28,7 @@ describe SugoiHttpRequestTester do
             json = JSON.parse($1)
             { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
           }
-          tester.import_logs
+          tester.import_logs!
           array = tester.run(output_format: :array)
           expect(array.size).to eq 3
         end
@@ -54,7 +54,7 @@ describe SugoiHttpRequestTester do
             json = JSON.parse($1)
             { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
           }
-          tester.import_logs
+          tester.import_logs!
           array = tester.run(output_format: :array)
           expect(array.size).to eq 3
         end
@@ -81,7 +81,7 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.import_logs
+      tester.import_logs!
       tester.run
       expect(tester.instance_eval { @request_list.size }).to eq 3
     end
@@ -107,7 +107,7 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.import_logs
+      tester.import_logs!
       tester.run
       expect(File.open(SugoiHttpRequestTester::EXPORT_MANUAL_LIST_PATH).readlines.size).to eq 1
     end
@@ -132,7 +132,7 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.import_logs
+      tester.import_logs!
       expect(tester.instance_eval { @request_list.size }).to eq 1
     end
   end
@@ -156,7 +156,7 @@ describe SugoiHttpRequestTester do
           json = JSON.parse($1)
           { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
         }
-        tester.import_logs
+        tester.import_logs!
         tester.export_request_list!
         expect(File.open(SugoiHttpRequestTester::EXPORT_REQUEST_LIST_PATH).readlines.size).to eq 3
         tester.clear_request_list!
@@ -184,10 +184,9 @@ describe SugoiHttpRequestTester do
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
-      tester.import_logs
-      tester.export_request_list!
-      expect(tester.request_list_export_files.size).to eq 1
-      export_file = tester.request_list_export_files.first
+      tester.import_logs!
+      expect(tester.export_request_list!.size).to eq 1
+      export_file = tester.export_request_list!.first
       expect(export_file.readlines.size).to eq 3
       tester.clear_request_list!
       expect(tester.instance_eval { @request_list.size }).to eq 0
@@ -223,29 +222,29 @@ describe SugoiHttpRequestTester do
       json = JSON.parse($1)
       { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
     }
-    tester.import_logs
+    tester.import_logs!
     # per カウントの確認
-    tester.export_request_list!(per: 2, limit_part_files_count: 3)
+    list = tester.export_request_list!(per: 2, limit_part_count: 3)
     expect(tester.instance_eval { @request_list.size }).not_to eq 0
-    expect(tester.request_list_export_files.size).to eq 3
-    tester.request_list_export_files.each do |file|
+    expect(list.size).to eq 3
+    list.each do |file|
       expect(file.readlines.size).to eq 2
       file.unlink
     end
     # URLが均等になっているかの確認
-    tester.export_request_list!(per: 3, limit_part_files_count: 4)
+    list = tester.export_request_list!(per: 3, limit_part_count: 4)
     expect(tester.instance_eval { @request_list.size }).not_to eq 0
-    expect(tester.request_list_export_files.size).to eq 4
-    file = tester.request_list_export_files[0]
+    expect(list.size).to eq 4
+    file = list[0]
     texts = file.readlines
     expect(JSON.parse(texts[0])['path']).to eq "/index.html"
     expect(JSON.parse(texts[1])['path']).to eq "/events/index5.html"
     expect(JSON.parse(texts[2])['path']).to eq "/help/index5.html"
-    file = tester.request_list_export_files[1]
+    file = list[1]
     texts = file.readlines
     expect(JSON.parse(texts[0])['path']).to eq "/info/index6.html"
     expect(JSON.parse(texts[1])['path']).to eq "/index2.html"
     expect(JSON.parse(texts[2])['path']).to eq "/help/index2.html"
-    tester.request_list_export_files.map(&:unlink)
+    list.map(&:unlink)
   end
 end
