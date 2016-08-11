@@ -112,7 +112,7 @@ module SugoiHttpRequestTester
       @exporter.results
     end
 
-    def set_line_parse_block=(block)
+    def line_parse_block=(block)
       @line_parser_block = block
     end
 

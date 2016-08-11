@@ -29,12 +29,12 @@ tester = SugoiHttpRequestTester.new(
   basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
   concurrency: 10,
 )
-tester.set_line_parse_block = ->(line){
+tester.line_parse_block = ->(line){
   /({.*})/ =~ line
   json = JSON.parse($1)
   { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
 }
-tester.import_logs
+tester.import_logs!
 tester.export_request_list
 tester.run
 ```

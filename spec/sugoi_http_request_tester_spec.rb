@@ -23,7 +23,7 @@ describe SugoiHttpRequestTester do
             logs_path: 'spec/logs/*',
             concurrency: 3,
           )
-          tester.set_line_parse_block = ->(line){
+          tester.line_parse_block = ->(line){
             /({.*})/ =~ line
             json = JSON.parse($1)
             { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -49,7 +49,7 @@ describe SugoiHttpRequestTester do
             logs_path: 'spec/logs/*',
             concurrency: 1,
           )
-          tester.set_line_parse_block = ->(line){
+          tester.line_parse_block = ->(line){
             /({.*})/ =~ line
             json = JSON.parse($1)
             { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -76,7 +76,7 @@ describe SugoiHttpRequestTester do
         logs_path: 'spec/logs/*',
         concurrency: 3,
       )
-      tester.set_line_parse_block = ->(line){
+      tester.line_parse_block = ->(line){
         /({.*})/ =~ line
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -102,7 +102,7 @@ describe SugoiHttpRequestTester do
         logs_path: 'spec/logs/*',
         concurrency: 3,
       )
-      tester.set_line_parse_block = ->(line){
+      tester.line_parse_block = ->(line){
         /({.*})/ =~ line
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -127,7 +127,7 @@ describe SugoiHttpRequestTester do
         limit: 1,
         logs_path: 'spec/logs/*',
       )
-      tester.set_line_parse_block = ->(line){
+      tester.line_parse_block = ->(line){
         /({.*})/ =~ line
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -151,7 +151,7 @@ describe SugoiHttpRequestTester do
           host: 'example.com',
           logs_path: 'spec/logs/*',
         )
-        tester.set_line_parse_block = ->(line){
+        tester.line_parse_block = ->(line){
           /({.*})/ =~ line
           json = JSON.parse($1)
           { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -179,7 +179,7 @@ describe SugoiHttpRequestTester do
         limit: 100,
         logs_path: 'spec/logs/*',
       )
-      tester.set_line_parse_block = ->(line){
+      tester.line_parse_block = ->(line){
         /({.*})/ =~ line
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -217,7 +217,7 @@ describe SugoiHttpRequestTester do
       limit: 100,
       logs_path: 'spec/logs/*',
     )
-    tester.set_line_parse_block = ->(line){
+    tester.line_parse_block = ->(line){
       /({.*})/ =~ line
       json = JSON.parse($1)
       { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
@@ -231,6 +231,12 @@ describe SugoiHttpRequestTester do
       expect(file.readlines.size).to eq 2
       file.unlink
     end
+
+    # per カウントの確認/array
+    list = tester.export_request_list!(per: 2, limit_part_count: 3, export_format: :array)
+    expect(list.size).to eq 3
+    list.map { |x| expect(x.is_a?(Array)).to eq true }
+
     # URLが均等になっているかの確認
     list = tester.export_request_list!(per: 3, limit_part_count: 4)
     expect(tester.instance_eval { @request_list.size }).not_to eq 0
