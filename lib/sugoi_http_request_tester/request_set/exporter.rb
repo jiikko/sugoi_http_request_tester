@@ -13,11 +13,11 @@ module SugoiHttpRequestTester
         temp_requests = []
         @per.times do
           request = sorted_requests.pop
-          request ? (temp_requests << request) : break
+          request ? (temp_requests << request.to_hash) : break
         end
         temp_requests.empty? ? break : requests_list << temp_requests
       end
-      requests_list.map(:to_hash)
+      requests_list
     end
 
     # should unlink to tempfile.
