@@ -17,7 +17,7 @@ module SugoiHttpRequestTester
         end
         temp_requests.empty? ? break : requests_list << temp_requests
       end
-      requests_list
+      requests_list.map(:to_hash)
     end
 
     # should unlink to tempfile.
