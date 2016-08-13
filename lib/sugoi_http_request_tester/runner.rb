@@ -38,7 +38,7 @@ module SugoiHttpRequestTester
         end
 
         def add_result(to: , request: , code: nil)
-          @results << request.to_hash.merge(status_code: code)
+          @results << request.to_hash.merge(status_code: code.to_i)
         end
       end
     end

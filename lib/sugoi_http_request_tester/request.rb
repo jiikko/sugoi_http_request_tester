@@ -12,6 +12,7 @@ module SugoiHttpRequestTester
     }
 
     def initialize(method: , user_agent: nil, path: , device_type: nil)
+      raise('method is not string') unless method.is_a?(String)
       @method = method
       if user_agent
         @user_agent = user_agent
