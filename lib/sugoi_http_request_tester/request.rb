@@ -6,9 +6,18 @@ module SugoiHttpRequestTester
       attr_accessor :host, :basic_auth
     end
 
-    def initialize(method: , user_agent: , path: )
+    DEVICE_TABLE = {
+      pc: "sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
+      sp: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36 sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
+    }
+
+    def initialize(method: , user_agent: nil, path: , device_type: nil)
       @method = method
-      @user_agent = user_agent
+      if user_agent
+        @user_agent = user_agent
+      else
+        @user_agent = to_user_agent(device_type)
+      end
       @path = path
     end
 
@@ -48,9 +57,7 @@ module SugoiHttpRequestTester
     private
 
     def normalized_user_agent
-      { pc: "sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
-        sp: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36 sugou_http_request_tester #{SugoiHttpRequestTester::VERSION}",
-      }[user_agent_type]
+      DEVICE_TABLE[user_agent_type]
     end
 
     def user_agent_type
@@ -59,6 +66,10 @@ module SugoiHttpRequestTester
       else
         :pc
       end
+    end
+
+    def to_user_agent(device_type)
+      DEVICE_TABLE[device_type]
     end
   end
 end
