@@ -13,6 +13,9 @@ module SugoiHttpRequestTester
     end
 
     def <<(request)
+      if request.path.nil?
+        return true
+      end
       if under_limit?
         @requests[request.hash] = request
         true
