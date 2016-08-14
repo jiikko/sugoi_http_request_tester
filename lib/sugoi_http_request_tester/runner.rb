@@ -54,7 +54,13 @@ module SugoiHttpRequestTester
     end
 
     def run(output_format: :file)
-      @output_format = output_format
+      @output_format_instance =
+        case output_format
+        when :file
+          OutputFormat::File.new
+        else
+          OutputFormat::Array.new
+        end
       if @thread_list.size <= 1
         sequential_run
       else
@@ -106,23 +112,13 @@ module SugoiHttpRequestTester
     private
 
     def results
-      output_format_instance.to_format
+      @output_format_instance.to_format
     end
 
     def add_result(to: , request: , code: nil)
       @thread_list.mutex_synchronize do
-        output_format_instance.add_result(to: to, request: request, code: code)
+        @output_format_instance.add_result(to: to, request: request, code: code)
       end
-    end
-
-    def output_format_instance
-      @output_format_instance ||=
-        case @output_format
-        when :file
-          OutputFormat::File.new
-        when :array
-          OutputFormat::Array.new
-        end
     end
 
     def json_parse_block
@@ -140,6 +136,7 @@ module SugoiHttpRequestTester
     end
 
     def concurrent_run
+      raise 'error thread_list' unless @thread_list.live?
       @request_list.each do |request|
         @thread_list.push_queue { add_result(request.run) }
       end

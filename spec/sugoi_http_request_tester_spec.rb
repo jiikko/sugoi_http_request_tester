@@ -32,9 +32,7 @@ describe SugoiHttpRequestTester do
           array = tester.run(output_format: :array)
           expect(array.size).to eq 3
 
-          tester.import_logs!
-          array = tester.run(output_format: :array)
-          expect(array.size).to eq 3
+          expect { tester.run(output_format: :array) }.to raise_error RuntimeError
         end
       end
       context 'when sequential' do
@@ -59,6 +57,9 @@ describe SugoiHttpRequestTester do
             { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
           }
           tester.import_logs!
+          array = tester.run(output_format: :array)
+          expect(array.size).to eq 3
+
           array = tester.run(output_format: :array)
           expect(array.size).to eq 3
         end

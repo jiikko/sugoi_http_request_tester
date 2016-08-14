@@ -37,5 +37,10 @@ module SugoiHttpRequestTester
     def size
       @threads.size
     end
+
+    def live?
+      # stop?だとsleepでもtrueが返ってきた
+      @threads.all?(&:status)
+    end
   end
 end
