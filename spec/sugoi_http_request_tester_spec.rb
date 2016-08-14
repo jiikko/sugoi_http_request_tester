@@ -31,6 +31,10 @@ describe SugoiHttpRequestTester do
           tester.import_logs!
           array = tester.run(output_format: :array)
           expect(array.size).to eq 3
+
+          tester.import_logs!
+          array = tester.run(output_format: :array)
+          expect(array.size).to eq 3
         end
       end
       context 'when sequential' do

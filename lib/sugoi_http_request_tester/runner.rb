@@ -54,7 +54,6 @@ module SugoiHttpRequestTester
     end
 
     def run(output_format: :file)
-      @output_format_instance = nil
       @output_format = output_format
       if @thread_list.size <= 1
         sequential_run
@@ -62,19 +61,6 @@ module SugoiHttpRequestTester
         concurrent_run
       end
       results
-    end
-
-    def sequential_run
-      @request_list.each do |request|
-        add_result(request.run)
-      end
-    end
-
-    def concurrent_run
-      @request_list.each do |request|
-        @thread_list.push_queue { add_result(request.run) }
-      end
-      @thread_list.join
     end
 
     def import_logs!
@@ -120,7 +106,7 @@ module SugoiHttpRequestTester
     private
 
     def results
-      @output_format_instance.to_format
+      output_format_instance.to_format
     end
 
     def add_result(to: , request: , code: nil)
@@ -145,6 +131,19 @@ module SugoiHttpRequestTester
         json = JSON.parse($1)
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
+    end
+
+    def sequential_run
+      @request_list.each do |request|
+        add_result(request.run)
+      end
+    end
+
+    def concurrent_run
+      @request_list.each do |request|
+        @thread_list.push_queue { add_result(request.run) }
+      end
+      @thread_list.join
     end
   end
 end
