@@ -54,6 +54,7 @@ module SugoiHttpRequestTester
     end
 
     def run(output_format: :file)
+      @output_format_instance = nil
       @output_format = output_format
       if @thread_list.size <= 1
         sequential_run
