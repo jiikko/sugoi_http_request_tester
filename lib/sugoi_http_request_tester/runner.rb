@@ -50,7 +50,7 @@ module SugoiHttpRequestTester
       @thread_list = ThreadList.new(options[:concurrency])
       Request.host = options[:host]
       Request.basic_auth = options[:basic_auth]
-      Dir.mkdir(EXPORT_BASE_DIR) unless ::File.exists?(EXPORT_BASE_DIR)
+      Dir.mkdir(EXPORT_BASE_DIR) unless ::File.exist?(EXPORT_BASE_DIR)
     end
 
     def run(output_format: :file)

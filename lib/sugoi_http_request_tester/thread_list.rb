@@ -1,7 +1,6 @@
 module SugoiHttpRequestTester
   class ThreadList
     def initialize(concarency)
-      threads = []
       @queue = SizedQueue.new(100)
       @mutex = Mutex.new
       @threads = Array.new(concarency).map do

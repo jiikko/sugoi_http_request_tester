@@ -45,7 +45,7 @@ module SugoiHttpRequestTester
         Net::HTTP.start(self.class.host) do |http|
           req = Net::HTTP::Get.new(@path)
           req.add_field('User-Agent', normalized_user_agent) unless @user_agent.nil?
-          req.basic_auth *self.class.basic_auth unless self.class.basic_auth.nil?
+          req.basic_auth(*self.class.basic_auth) unless self.class.basic_auth.nil?
           response = http.request(req)
           { to: :accessed_list, request: self, code: response.code }
         end

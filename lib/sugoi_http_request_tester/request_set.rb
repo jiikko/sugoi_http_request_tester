@@ -37,7 +37,7 @@ module SugoiHttpRequestTester
     private
 
     def under_limit?
-      if @limit.is_a?(Numeric)
+      if defined?(@limit)
         @limit_counter += 1
         @limit_counter <= @limit
       else
