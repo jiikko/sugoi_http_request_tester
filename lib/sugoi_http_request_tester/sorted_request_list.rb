@@ -21,7 +21,7 @@ module SugoiHttpRequestTester
 
     def group_by_path(requests)
       requests.group_by do |request|
-        request.path =~ %r!([\w\d\-_]+)!
+        request.path =~ %r!([\w\-]+)!
         $1
       end
     end
