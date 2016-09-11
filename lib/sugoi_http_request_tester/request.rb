@@ -46,6 +46,8 @@ module SugoiHttpRequestTester
           req = Net::HTTP::Get.new(@path)
           req.add_field('User-Agent', normalized_user_agent) unless @user_agent.nil?
           req.basic_auth(*self.class.basic_auth) unless self.class.basic_auth.nil?
+          http.open_timeout = 5
+          http.read_timeout = 5
           response = http.request(req)
           { to: :accessed_list, request: self, code: response.code }
         end
