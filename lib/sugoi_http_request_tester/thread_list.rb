@@ -5,14 +5,17 @@ module SugoiHttpRequestTester
       @mutex = Mutex.new
       @threads = Array.new(concarency).map do
         Thread.new do
-          begin
-            loop do
-              block = @queue.pop
+          loop do
+            retry_counter = 0
+            block = @queue.pop
+            begin
               block ? block.call : break
+            rescue Exception => e # タイムアウトとかくる
+              retry_counter = retry_counter + 1
+              puts e.message
+              puts e.backtrace.join("\n")
+              retry if retry_counter < 10
             end
-          rescue Exception => e
-            puts e.message
-            puts e.backtrace.join("\n")
           end
         end
       end
