@@ -138,7 +138,10 @@ module SugoiHttpRequestTester
     def concurrent_run
       raise 'error thread_list' unless @thread_list.live?
       @request_list.each do |request|
-        @thread_list.push_queue { add_result(request.run) }
+        @thread_list.push_queue({
+          request: request, # for exception
+          block:   ->() { add_result(request.run) }
+        })
       end
       @thread_list.join
     end

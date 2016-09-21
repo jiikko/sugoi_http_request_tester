@@ -7,14 +7,18 @@ module SugoiHttpRequestTester
         Thread.new do
           loop do
             retry_counter = 0
-            block = @queue.pop
+            hash = @queue.pop
             begin
-              block ? block.call : break
-            rescue Exception => e # タイムアウトとかくる
+              hash ? hash[:block].call : break
+            rescue Timeout::Error => e
+              puts hash[:request].to_hash
+              puts e.message
               retry_counter = retry_counter + 1
+              retry if retry_counter < 3
+            rescue Exception => e
+              puts hash[:request].to_hash
               puts e.message
               puts e.backtrace.join("\n")
-              retry if retry_counter < 10
             end
           end
         end
@@ -27,8 +31,8 @@ module SugoiHttpRequestTester
       end
     end
 
-    def push_queue(&block)
-      @queue.push(block)
+    def push_queue(hash)
+      @queue.push(hash)
     end
 
     def join
