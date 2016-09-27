@@ -26,7 +26,7 @@ module SugoiHttpRequestTester
         tempfile = Tempfile.new('part_export')
         File.write(tempfile.path,
                   requests.map { |request| request.to_json }.join("\n"))
-        puts tempfile.path
+        puts tempfile.path # for debug
         tempfile
       end
     end
@@ -41,10 +41,11 @@ module SugoiHttpRequestTester
       @requests.map { |request| request.to_json }
     end
 
+    # should unlink to tempfile.
     def files
-      File.write(EXPORT_REQUEST_LIST_PATH, array.join("\n"))
-      file = File.open(EXPORT_REQUEST_LIST_PATH, 'r')
-      [file]
+      tempfile = Tempfile.new('part_export')
+      File.write(tempfile, array.join("\n"))
+      [tempfile]
     end
   end
 
@@ -69,6 +70,7 @@ module SugoiHttpRequestTester
         export_format_instance.files
       when :array
         export_format_instance.array
+      else
       end
     end
 

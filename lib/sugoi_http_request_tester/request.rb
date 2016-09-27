@@ -49,10 +49,10 @@ module SugoiHttpRequestTester
           http.open_timeout = 5
           http.read_timeout = 5
           response = http.request(req)
-          { to: :accessed_list, request: self, code: response.code }
+          { request: self, code: response.code }
         end
       else
-        { to: :manual_list, request: self }
+        { request: self }
       end
     end
 

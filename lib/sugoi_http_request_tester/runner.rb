@@ -1,72 +1,22 @@
 module SugoiHttpRequestTester
   class Runner
-    module OutputFormat
-      class File
-        def initialize
-          ::File.write(SugoiHttpRequestTester::EXPORT_ACCESSED_LIST_PATH, '')
-          ::File.write(SugoiHttpRequestTester::EXPORT_MANUAL_LIST_PATH, '')
-        end
-
-        def add_result(to: , request: , code: nil)
-          case to
-          when :accessed_list
-            puts code
-            ::File.open(EXPORT_ACCESSED_LIST_PATH, 'a') do |f|
-              f.puts([request.to_json, code].join(','))
-            end
-          when :manual_list
-            ::File.open(EXPORT_MANUAL_LIST_PATH, 'a') do |f|
-              f.puts(request.to_json)
-            end
-          else
-            raise 'bug!!'
-          end
-        end
-
-        def to_format
-          true
-        end
-      end
-
-      class Array
-        def initialize
-          @results = []
-        end
-
-        def to_format
-          @results
-        end
-
-        def add_result(to: , request: , code: nil)
-          @results << request.to_hash.merge(status_code: code.to_i)
-        end
-      end
-    end
-
     def initialize(options = {})
       @logs_path = options[:logs_path]
       @request_list = RequestSet.new(limit: options[:limit])
-      @line_parser_block = json_parse_block
+      @line_parser_block = default_json_parse_block
       @thread_list = ThreadList.new(options[:concurrency])
       Request.host = options[:host]
       Request.basic_auth = options[:basic_auth]
-      Dir.mkdir(EXPORT_BASE_DIR) unless ::File.exist?(EXPORT_BASE_DIR)
     end
 
-    def run(output_format: :file)
-      @output_format_instance =
-        case output_format
-        when :file
-          OutputFormat::File.new
-        else
-          OutputFormat::Array.new
-        end
+    def run
+      @results = []
       if @thread_list.size <= 1
         sequential_run
       else
         concurrent_run
       end
-      results
+      @results
     end
 
     def import_logs!
@@ -79,10 +29,10 @@ module SugoiHttpRequestTester
       end
     end
 
-    def import_request_list_from_file
+    def import_request_list_from_file(path)
       clear_request_list!
-      ::File.open(EXPORT_REQUEST_LIST_PATH).each_line do |line|
-        break unless @request_list << Request.new(json_parse_block.call(line))
+      ::File.open(path).each_line do |line|
+        break unless @request_list << Request.new(@line_parser_block.call(line))
       end
     end
 
@@ -115,13 +65,13 @@ module SugoiHttpRequestTester
       @output_format_instance.to_format
     end
 
-    def add_result(to: , request: , code: nil)
+    def add_result(request: , code: nil)
       @thread_list.mutex_synchronize do
-        @output_format_instance.add_result(to: to, request: request, code: code)
+        @results << request.to_hash.merge(status_code: code.to_i)
       end
     end
 
-    def json_parse_block
+    def default_json_parse_block
       ->(line){
         /({.*})/ =~ line
         json = JSON.parse($1)
@@ -136,11 +86,11 @@ module SugoiHttpRequestTester
     end
 
     def concurrent_run
-      raise 'error thread_list' unless @thread_list.live?
+      raise 'not exists living thread_list' unless @thread_list.live?
       @request_list.each do |request|
         @thread_list.push_queue({
           request: request, # for exception
-          block:   ->() { add_result(request.run) }
+          block:   ->(){ add_result(request.run) }
         })
       end
       @thread_list.join
