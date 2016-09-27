@@ -71,6 +71,7 @@ module SugoiHttpRequestTester
       when :array
         export_format_instance.array
       else
+        raise('unkown format')
       end
     end
 

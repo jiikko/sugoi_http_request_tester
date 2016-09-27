@@ -15,8 +15,6 @@ require 'tempfile'
 # https
 
 module SugoiHttpRequestTester
-  EXPORT_BASE_DIR = 'output'
-
   def self.new(host:, limit: nil, basic_auth: nil, logs_path: , concurrency: 1)
     Runner.new(host: host,
                limit: limit,
