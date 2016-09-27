@@ -28,7 +28,6 @@ module SugoiHttpRequestTester
     def import_logs!
       clear_request_list!
       Dir.glob(@logs_path).each do |file_name|
-        next if /\.gz$/ =~ file_name
         File.open(file_name).each_line do |line|
           break unless @request_list << Request.new(@line_parse_block.call(line))
         end

@@ -36,7 +36,7 @@ tester.line_parse_block = ->(line){
   { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
 }
 tester.import_logs!
-tester.run
+tester.run!
 ```
 
 # TODO

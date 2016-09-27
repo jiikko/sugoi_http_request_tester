@@ -26,12 +26,12 @@ module SugoiHttpRequestTester
     end
 
     def to_hash
-      { method: @method,
-        user_agent: normalized_user_agent,
-        path: @path,
-        mt: @method,
-        ua: @user_agent,
-        pt: @path,
+      { method:      @method,
+        user_agent:  normalized_user_agent,
+        path:        @path,
+        mt:          @method,
+        ua:          @user_agent,
+        pt:          @path,
         device_type: user_agent_type,
       }
     end
@@ -46,8 +46,8 @@ module SugoiHttpRequestTester
           req = Net::HTTP::Get.new(@path)
           req.add_field('User-Agent', normalized_user_agent) unless @user_agent.nil?
           req.basic_auth(*self.class.basic_auth) unless self.class.basic_auth.nil?
-          http.open_timeout = 5
-          http.read_timeout = 5
+          http.open_timeout = 3
+          http.read_timeout = 3
           response = http.request(req)
           { request: self, code: response.code }
         end
