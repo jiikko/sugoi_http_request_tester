@@ -9,7 +9,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sugoi_http_request_tester'
+gem 'sugoi_http_request_tester', 'jiikko/sugoi_http_request_tester'
 ```
 
 And then execute:
