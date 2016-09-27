@@ -1,7 +1,7 @@
 # SugoiHttpRequestTester
 
 * Send http request from access log.
-* 取り込んだURLをデバイス毎に正規化する
+* 取り込んだURLをデバイス毎にユニークにする
 * 並列実行
 
 ## Installation
