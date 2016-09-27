@@ -160,11 +160,12 @@ describe SugoiHttpRequestTester do
       }
       tester.import_logs!
       expect(tester.export_request_list!.size).to eq 1
-      export_file = tester.export_request_list!.first
-      expect(export_file.readlines.size).to eq 3
+      files = tester.export_request_list!
+      file = files[0]
+      expect(file.readlines.size).to eq 3
       tester.clear_request_list!
       expect(tester.instance_eval { @request_list.size }).to eq 0
-      tester.import_request_list_from_file
+      tester.import_request_list_from_file(file)
       expect(tester.instance_eval { @request_list.size }).to eq 3
     end
   end

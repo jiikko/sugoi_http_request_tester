@@ -1,9 +1,11 @@
 module SugoiHttpRequestTester
   class Runner
+    attr_writer :line_parse_block
+
     def initialize(options = {})
       @logs_path = options[:logs_path]
       @request_list = RequestSet.new(limit: options[:limit])
-      @line_parser_block = default_json_parse_block
+      @line_parse_block = default_json_parse_block
       @thread_list = ThreadList.new(options[:concurrency])
       Request.host = options[:host]
       Request.basic_auth = options[:basic_auth]
@@ -19,20 +21,24 @@ module SugoiHttpRequestTester
       @results
     end
 
+    def run!
+      run
+    end
+
     def import_logs!
       clear_request_list!
       Dir.glob(@logs_path).each do |file_name|
         next if /\.gz$/ =~ file_name
-        ::File.open(file_name).each_line do |line|
-          break unless @request_list << Request.new(@line_parser_block.call(line))
+        File.open(file_name).each_line do |line|
+          break unless @request_list << Request.new(@line_parse_block.call(line))
         end
       end
     end
 
     def import_request_list_from_file(path)
       clear_request_list!
-      ::File.open(path).each_line do |line|
-        break unless @request_list << Request.new(@line_parser_block.call(line))
+      File.open(path).each_line do |line|
+        break unless @request_list << Request.new(@line_parse_block.call(line))
       end
     end
 
@@ -53,10 +59,6 @@ module SugoiHttpRequestTester
                                             export_format: export_format,
                                             limit_part_count: limit_part_count)
       @exporter.results
-    end
-
-    def line_parse_block=(block)
-      @line_parser_block = block
     end
 
     private
