@@ -1,6 +1,8 @@
 # SugoiHttpRequestTester
 
-* run http request from access log.
+* Send http request from access log.
+* 取り込んだURLをデバイス毎に正規化する
+* 並列実行
 
 ## Installation
 
@@ -26,7 +28,6 @@ tester = SugoiHttpRequestTester.new(
   host: 'example.com',
   limit: 10000,
   logs_path: 'logs_source/*',
-  basic_auth: [ENV['OUTING_BASIC_AUTH_USER'], ENV['OUTING_BASIC_AUTH_PASSWORD']],
   concurrency: 10,
 )
 tester.line_parse_block = ->(line){
@@ -35,10 +36,9 @@ tester.line_parse_block = ->(line){
   { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
 }
 tester.import_logs!
-tester.export_request_list
 tester.run
 ```
 
-## Contributing
-
-Bug reports and pull requests are welcome.
+# TODO
+* support not GET http method
+* support https
