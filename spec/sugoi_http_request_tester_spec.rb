@@ -130,8 +130,7 @@ describe SugoiHttpRequestTester do
           logs_path: 'spec/logs/*',
         )
         tester.import_logs!
-        files = tester.export_request_list!
-        file = files[0]
+        file = tester.export_request_list!
         expect(file.readlines.size).to eq 3
         tester.clear_request_list!
         expect(tester.instance_eval { @request_list.size }).to eq 0
@@ -159,9 +158,7 @@ describe SugoiHttpRequestTester do
         { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
       }
       tester.import_logs!
-      expect(tester.export_request_list!.size).to eq 1
-      files = tester.export_request_list!
-      file = files[0]
+      file = tester.export_request_list!
       expect(file.readlines.size).to eq 3
       tester.clear_request_list!
       expect(tester.instance_eval { @request_list.size }).to eq 0
@@ -198,34 +195,27 @@ describe SugoiHttpRequestTester do
       { method: json['mt'], user_agent: json['ua'], path: json['pt'] }
     }
     tester.import_logs!
-    # per カウントの確認
-    list = tester.export_request_list!(per: 2, limit_part_count: 3)
+    # export_format: :file
+    file = tester.export_request_list!
     expect(tester.instance_eval { @request_list.size }).not_to eq 0
-    expect(list.size).to eq 3
-    list.each do |file|
-      expect(file.readlines.size).to eq 2
-      file.unlink
-    end
+    expect(file.readlines.size).to eq 13
+    file.unlink
 
-    # per カウントの確認/array
-    list = tester.export_request_list!(per: 2, limit_part_count: 3, export_format: :array)
-    expect(list.size).to eq 3
-    list.map { |x| expect(x.is_a?(Array)).to eq true }
+    # export_format: :array
+    list = tester.export_request_list!(export_format: :array)
+    expect(list.size).to eq 13
+    expect(list.is_a?(Array)).to eq true
 
     # URLが均等になっているかの確認
-    list = tester.export_request_list!(per: 3, limit_part_count: 4)
+    file = tester.export_request_list!
     expect(tester.instance_eval { @request_list.size }).not_to eq 0
-    expect(list.size).to eq 4
-    file = list[0]
     texts = file.readlines
     expect(JSON.parse(texts[0])['path']).to eq "/index.html"
     expect(JSON.parse(texts[1])['path']).to eq "/events/index5.html"
     expect(JSON.parse(texts[2])['path']).to eq "/help/index5.html"
-    file = list[1]
-    texts = file.readlines
-    expect(JSON.parse(texts[0])['path']).to eq "/info/index6.html"
-    expect(JSON.parse(texts[1])['path']).to eq "/index2.html"
-    expect(JSON.parse(texts[2])['path']).to eq "/help/index2.html"
-    list.map(&:unlink)
+    expect(JSON.parse(texts[3])['path']).to eq "/info/index6.html"
+    expect(JSON.parse(texts[4])['path']).to eq "/index2.html"
+    expect(JSON.parse(texts[5])['path']).to eq "/help/index2.html"
+    file.unlink
   end
 end
