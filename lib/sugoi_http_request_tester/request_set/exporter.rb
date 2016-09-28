@@ -5,20 +5,26 @@ module SugoiHttpRequestTester
     end
 
     def to_array
-      list = []
-      sorted_requests = SortedRequestList.new(@requests)
-      @requests.each do
-        request = sorted_requests.pop
-        list << request.to_json if request
-      end
-      list
+      sorted_requests.map(&:to_hash)
     end
 
     # should unlink to tempfile.
     def to_file
       tempfile = Tempfile.new('part_export')
-      File.write(tempfile, to_array.join("\n"))
+      File.write(tempfile, sorted_requests.map(&:to_json).join("\n"))
       tempfile
+    end
+
+    private
+
+    def sorted_requests
+      list = []
+      sorted_request_list = SortedRequestList.new(@requests)
+      @requests.each do
+        request = sorted_request_list.pop
+        list << request if request
+      end
+      list
     end
   end
 
