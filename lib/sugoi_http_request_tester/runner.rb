@@ -60,10 +60,6 @@ module SugoiHttpRequestTester
 
     private
 
-    def results
-      @output_format_instance.to_format
-    end
-
     def add_result(request: , code: nil)
       @thread_list.mutex_synchronize do
         @results << request.to_hash.merge(status_code: code.to_i)
