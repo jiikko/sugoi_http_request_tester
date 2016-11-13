@@ -39,7 +39,7 @@ describe SugoiHttpRequestTester do
           log = <<-LOG
 {"mt":"GET","pt":"/index.html","ua":"ddd"}
 {"mt":"GET","pt":"/index2.html","ua":"ddd"}
-{"mt":"GET","pt":"/index2.html","ua":"ddd"}
+{"mt":"GET","pt":"/index2.html","ua":"ccc"}
 {"mt":"GET","pt":"/index3.html","ua":"ddd"}
           LOG
           File.write('spec/logs/log1', log)

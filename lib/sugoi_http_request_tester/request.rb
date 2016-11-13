@@ -22,7 +22,7 @@ module SugoiHttpRequestTester
     end
 
     def hash
-      Digest::MD5.hexdigest([@method, @user_agent, @path].join)
+      Digest::MD5.hexdigest([@method, user_agent_type, @path].join)
     end
 
     def to_hash
